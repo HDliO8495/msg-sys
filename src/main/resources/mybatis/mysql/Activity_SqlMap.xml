@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dingdang.common.dao.ActivityMapper" >
+  <resultMap id="ActivityResultMap" type="com.dingdang.common.domain.Activity" >
+    <id column="activity_id" property="activityId" jdbcType="VARCHAR" />
+    <result column="store_id" property="storeId" jdbcType="VARCHAR" />
+    <result column="storeName" property="storeName" jdbcType="VARCHAR" />
+    <result column="activity_number" property="activityNumber" jdbcType="VARCHAR" />
+    <result column="activity_name" property="activityName" jdbcType="VARCHAR" />
+    <result column="activity_content" property="activityContent" jdbcType="VARCHAR" />
+    <result column="activity_type" property="activityType" jdbcType="CHAR" />
+    <result column="activity_scope" property="activityScope" jdbcType="CHAR" />
+    <result column="layout_type" property="layoutType" jdbcType="CHAR" />
+    <result column="goto_type" property="gotoType" jdbcType="CHAR" />
+    <result column="award_count" property="awardCount" jdbcType="INTEGER" />
+    <result column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="image_url" property="imageUrl" jdbcType="VARCHAR" />
+    <result column="target_url" property="targetUrl" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="remarks" property="remarks" jdbcType="VARCHAR" />
+    <result column="creater" property="creater" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modifier" property="modifier" jdbcType="VARCHAR" />
+    <result column="modify_time" property="modifyTime" jdbcType="DATE" />
+    <result column="chld_rdenv_num" property="chldRdenvNum" jdbcType="INTEGER"/>
+    <result column="upper_limit" property="upperLimit" jdbcType="INTEGER"/>
+    <result column="lower_limit" property="lowerLimit" jdbcType="INTEGER"/>
+    <result column="back_image_url" property="backImageUrl" jdbcType="VARCHAR"/>
+    <result column="over_back_image_url" property="overBackImageUrl" jdbcType="VARCHAR"/>
+    <collection property="couponList" resultMap="com.dingdang.common.dao.CouponMapper.CouponResultMap" />
+  </resultMap>
+
+  <resultMap id="ActivityMap" type="com.dingdang.common.domain.Activity" >
+    <id column="activity_id" property="activityId" jdbcType="VARCHAR" />
+    <result column="store_id" property="storeId" jdbcType="VARCHAR" />
+    <result column="storeName" property="storeName" jdbcType="VARCHAR" />
+    <result column="activity_number" property="activityNumber" jdbcType="VARCHAR" />
+    <result column="activity_name" property="activityName" jdbcType="VARCHAR" />
+    <result column="activity_content" property="activityContent" jdbcType="VARCHAR" />
+    <result column="activity_type" property="activityType" jdbcType="CHAR" />
+    <result column="activity_scope" property="activityScope" jdbcType="CHAR" />
+    <result column="layout_type" property="layoutType" jdbcType="CHAR" />
+    <result column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="image_url" property="imageUrl" jdbcType="VARCHAR" />
+    <result column="target_url" property="targetUrl" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="remarks" property="remarks" jdbcType="VARCHAR" />
+    <result column="back_image_url" property="backImageUrl" jdbcType="VARCHAR"/>
+    <result column="over_back_image_url" property="overBackImageUrl" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <resultMap id="AppActivityResultMap" type="com.dingdang.app.domain.AppActivity" >
+    <id column="layout_type" property="type" jdbcType="VARCHAR" />
+    <collection property="activityList" resultMap="com.dingdang.common.dao.ActivityMapper.ActivityResultMap"/>
+  </resultMap>
+
+  <!-- 返回某个红包活动的固有信息、优惠券信息和property信息.暂时没用完善-->
+  <resultMap id="AppActivityResultMapCoupPro" type="com.dingdang.app.domain.AppActivity" >
+    <association property="activity" column="activity_id" resultMap="AppActivityResultMap"></association>
+    <collection property="properties" resultMap=""/>
+    <collection property="activityCoupons" resultMap=""/>
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    activity_id, store_id, activity_number, activity_name, activity_content, activity_type,activity_scope,layout_type,goto_type,
+    award_count, begin_time, end_time, image_url, target_url, status, remarks, creater,
+    create_time, modifier, modify_time,back_image_url,over_back_image_url
+  </sql>
+
+  <select id="selectAnySql" parameterType="map" resultType="java.util.HashMap" statementType="STATEMENT">  
+${sql}
+</select>
+  <delete id="deleteAnySql" parameterType="map"  statementType="STATEMENT">  
+${sql}
+  </delete>
+  <update id="updateAnySql" parameterType="map"  statementType="STATEMENT">  
+${sql}
+  </update>
+
+<select id="t_app_Activity_selectByPrimaryKey" resultMap="ActivityResultMap" parameterType="java.lang.String" >
+    select
+     activity_id, store_id, activity_number, activity_name, activity_content, activity_type,activity_scope,layout_type,goto_type,
+    award_count, begin_time, end_time, image_url, target_url, status, remarks, creater,
+    create_time, modifier, modify_time,back_image_url,over_back_image_url
+    from t_app_Activity
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </select>
+
+  <!-- 查找市代下所有的红包活动 -->
+  <select id="t_app_Activity_selectAllRedenvAct" resultMap="ActivityResultMap" parameterType="java.lang.String" >
+    select
+    activity_id, store_id, activity_number, activity_name, activity_content, activity_type,layout_type,goto_type,
+    award_count, begin_time, end_time, image_url, target_url, status, remarks, creater,activity_scope,
+    create_time, modifier, modify_time,back_image_url,over_back_image_url
+    from t_app_Activity
+    where store_id = #{storeId,jdbcType=VARCHAR}
+  </select>
+
+  <!-- 动态查找查找 -->
+  <select id="t_app_Activity_selectDynamic" resultMap="ActivityResultMap" >
+    SELECT
+     ac.activity_id,
+     ac.store_id,
+     (select s.store_name from t_cm_store s where s.store_id=ac.store_id LIMIT  0,1) as storeName,
+     ac.activity_number, ac.activity_name, ac.activity_content,
+      ac.activity_type,ac.layout_type,ac.goto_type,ac.chld_rdenv_num,ac.lower_limit,ac.upper_limit,
+    ac.award_count, ac.begin_time, ac.end_time, ac.image_url, ac.target_url, ac.status, ac.remarks,
+    (SELECT u.nick_name FROM t_user u WHERE u.user_id = ac.creater LIMIT  0,1) AS  creater,
+    (SELECT u.nick_name FROM t_user u WHERE u.user_id = ac.MODIFIER LIMIT  0,1) AS MODIFIER,
+    ac.create_time,
+    ac.modify_time
+    FROM t_app_Activity ac
+    WHERE 1=1
+    <if test="activityId != null" >
+      and ac.activity_id =#{activityId}
+    </if>
+    <if test="storeId != null" >
+      and ac.store_id =#{storeId}
+    </if>
+    <if test="sysAreasList != null">
+      AND exists(SELECT 1 from t_cm_store tcs WHERE tcs.store_id=ac.store_id and tcs.area_id in(
+        <foreach collection="sysAreasList" item="item" separator=",">
+          #{item.areaId}
+        </foreach>
+        )
+      )
+    </if>
+    <if test="status != null" >
+      and ac.status =#{status}
+    </if>
+    <if test="activityType != null" >
+      and ac.activity_type  =#{activityType}
+    </if>
+    <if test="layoutType != null" >
+      and ac.layout_type  =#{layoutType}
+    </if>
+    <if test="gotoType != null" >
+      and ac.goto_type  =#{gotoType}
+    </if>
+    <if test="activityContent != null" >
+      and ac.activity_content LIKE  "%"#{activityContent}"%"
+    </if>
+    <if test="activityName != null" >
+      and ac.activity_name LIKE  "%"#{activityName}"%"
+    </if>
+    <if test="beginTime != null" >
+      and UNIX_TIMESTAMP(ac.begin_time) &gt;= UNIX_TIMESTAMP(#{beginTime,jdbcType=VARCHAR})
+    </if>
+    <if test="endTime != null" >
+      and UNIX_TIMESTAMP(ac.end_time) &lt;= UNIX_TIMESTAMP(#{endTime,jdbcType=VARCHAR})
+    </if>
+  </select>
+   <!-- 动态查找查找-->
+
+  <delete id="t_app_Activity_delete" parameterType="java.lang.String" >
+    delete from t_app_Activity
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="t_app_Activity_insert" parameterType="com.dingdang.common.domain.Activity" >
+    insert into t_app_Activity (activity_id, store_id, activity_number,
+      activity_name, activity_content, activity_type,activity_scope,
+      layout_type,goto_type,chld_rdenv_num,upper_limit,lower_limit,
+      award_count, begin_time, end_time,
+      image_url, target_url, status,
+      remarks, creater, create_time,
+      modifier, modify_time,back_image_url,over_back_image_url)
+    values (#{activityId,jdbcType=VARCHAR}, #{storeId,jdbcType=VARCHAR}, #{activityNumber,jdbcType=VARCHAR},
+      #{activityName,jdbcType=VARCHAR}, #{activityContent,jdbcType=VARCHAR}, #{activityType,jdbcType=CHAR}, #{activityScope,jdbcType=CHAR},
+      #{layoutType,jdbcType=CHAR}, #{gotoType,jdbcType=CHAR},#{chldRdenvNum,jdbcType=INTEGER},#{upperLimit,jdbcType=INTEGER},#{lowerLimit,jdbcType=INTEGER},
+      #{awardCount,jdbcType=INTEGER}, #{beginTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP},
+      #{imageUrl,jdbcType=VARCHAR}, #{targetUrl,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+      #{remarks,jdbcType=VARCHAR}, #{creater,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+      #{modifier,jdbcType=VARCHAR}, #{modifyTime,jdbcType=DATE},#{backImageUrl,jdbcType=VARCHAR}, #{overBackImageUrl,jdbcType=VARCHAR})
+  </insert>
+  <insert id="t_app_Activity_insertSelective" parameterType="com.dingdang.common.domain.Activity" >
+    insert into t_app_Activity
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="activityId != null" >
+        activity_id,
+      </if>
+      <if test="storeId != null" >
+        store_id,
+      </if>
+      <if test="activityNumber != null" >
+        activity_number,
+      </if>
+      <if test="activityName != null" >
+        activity_name,
+      </if>
+      <if test="activityContent != null" >
+        activity_content,
+      </if>
+      <if test="activityType != null" >
+        activity_type,
+      </if>
+      <if test="activityScope != null" >
+        activity_scope,
+      </if>
+      <if test="layoutType != null" >
+        layout_type,
+      </if>
+      <if test="gotoType != null" >
+        goto_type,
+      </if>
+      <if test="awardCount != null" >
+        award_count,
+      </if>
+      <if test="beginTime != null" >
+        begin_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="imageUrl != null" >
+        image_url,
+      </if>
+      <if test="targetUrl != null" >
+        target_url,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="remarks != null" >
+        remarks,
+      </if>
+      <if test="creater != null" >
+        creater,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="modifier != null" >
+        modifier,
+      </if>
+      <if test="modifyTime != null" >
+        modify_time,
+      </if>
+      <if test="backImageUrl != null" >
+        back_image_url,
+      </if>
+      <if test="overBackImageUrl != null" >
+        over_back_image_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="activityId != null" >
+        #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeId != null" >
+        #{storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="activityNumber != null" >
+        #{activityNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="activityName != null" >
+        #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="activityContent != null" >
+        #{activityContent,jdbcType=VARCHAR},
+      </if>
+      <if test="activityType != null" >
+        #{activityType,jdbcType=CHAR},
+      </if>
+      <if test="activityScope != null" >
+        #{activityScope,jdbcType=CHAR},
+      </if>
+      <if test="layoutType != null" >
+        #{layoutType,jdbcType=CHAR},
+      </if>
+      <if test="gotoType != null" >
+        #{gotoType,jdbcType=CHAR},
+      </if>
+      <if test="awardCount != null" >
+        #{awardCount,jdbcType=INTEGER},
+      </if>
+      <if test="beginTime != null" >
+        #{beginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="imageUrl != null" >
+        #{imageUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="targetUrl != null" >
+        #{targetUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="remarks != null" >
+        #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="creater != null" >
+        #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifier != null" >
+        #{modifier,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null" >
+        #{modifyTime,jdbcType=DATE},
+      </if>
+      <if test="backImageUrl != null" >
+        #{backImageUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="overBackImageUrl != null" >
+        #{overBackImageUrl,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="t_app_Activity_update" parameterType="com.dingdang.common.domain.Activity" >
+    update t_app_Activity
+    <set >
+      <if test="storeId != null" >
+        store_id = #{storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="activityNumber != null" >
+        activity_number = #{activityNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="activityName != null" >
+        activity_name = #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="activityContent != null" >
+        activity_content = #{activityContent,jdbcType=VARCHAR},
+      </if>
+      <if test="activityType != null" >
+        activity_type = #{activityType,jdbcType=CHAR},
+      </if>
+      <if test="activityScope != null" >
+        activity_scope = #{activityScope,jdbcType=CHAR},
+      </if>
+      <if test="layoutType != null" >
+        layout_type = #{layoutType,jdbcType=CHAR},
+      </if>
+      <if test="gotoType != null" >
+        goto_type = #{gotoType,jdbcType=CHAR},
+      </if>
+      <if test="awardCount != null" >
+        award_count = #{awardCount,jdbcType=INTEGER},
+      </if>
+      <if test="beginTime != null" >
+        begin_time = #{beginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="imageUrl != null" >
+        image_url = #{imageUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="targetUrl != null" >
+        target_url = #{targetUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="remarks != null" >
+        remarks = #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="creater != null" >
+        creater = #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifier != null" >
+        modifier = #{modifier,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null" >
+        modify_time = #{modifyTime,jdbcType=DATE},
+      </if>
+      <if test="chldRdenvNum != null" >
+        chld_rdenv_num = #{chldRdenvNum,jdbcType=INTEGER},
+      </if>
+      <if test="upperLimit != null" >
+        upper_limit = #{upperLimit,jdbcType=INTEGER},
+      </if>
+      <if test="lowerLimit != null" >
+        lower_limit = #{lowerLimit,jdbcType=INTEGER},
+      </if>
+      <if test="backImageUrl != null" >
+        back_image_url = #{backImageUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="overBackImageUrl != null" >
+        over_back_image_url = #{overBackImageUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </update>
+  <update id="t_app_Activity_updateByPrimaryKey" parameterType="com.dingdang.common.domain.Activity" >
+    update t_app_Activity
+    set store_id = #{storeId,jdbcType=VARCHAR},
+      activity_number = #{activityNumber,jdbcType=VARCHAR},
+      activity_name = #{activityName,jdbcType=VARCHAR},
+      activity_content = #{activityContent,jdbcType=VARCHAR},
+      activity_type = #{activityType,jdbcType=CHAR},
+      activity_scope = #{activityScope,jdbcType=CHAR},
+      layout_type=#{layoutType,jdbcType=CHAR},
+      goto_type=#{gotoType,jdbcType=CHAR},
+      award_count = #{awardCount,jdbcType=INTEGER},
+      begin_time = #{beginTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      image_url = #{imageUrl,jdbcType=VARCHAR},
+      target_url = #{targetUrl,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      remarks = #{remarks,jdbcType=VARCHAR},
+      creater = #{creater,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modifier = #{modifier,jdbcType=VARCHAR},
+      modify_time = #{modifyTime,jdbcType=DATE},
+      back_image_url = #{backImageUrl,jdbcType=VARCHAR},
+      over_back_image_url = #{overBackImageUrl,jdbcType=VARCHAR}
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </update>
+
+  <select id="t_app_activity_selectActivityByType" resultMap="ActivityResultMap">
+    <![CDATA[
+      SELECT *
+      FROM t_app_activity act,t_app_coupon cou,t_app_activity_coupon aac
+      WHERE act.activity_id = aac.activity_id
+      AND cou.coupon_id = aac.coupon_id
+      AND act.status = '1'
+      AND cou.status = '1'
+      AND act.begin_time <= SYSDATE()
+      AND act.end_time>=SYSDATE()
+      AND act.activity_type = #{activityType,jdbcType=VARCHAR}
+    ]]>
+  </select>
+
+  <select id="t_app_activity_selectActivityByStoreIdWithinActiveTime" resultMap="AppActivityResultMap">
+    <![CDATA[
+      SELECT activity_id,store_id,activity_name,activity_content,begin_time,end_time,image_url,target_url,layout_type,goto_type
+      FROM t_app_activity
+      WHERE
+      STATUS = '1'
+      AND activity_type = '4'
+      AND SYSDATE() >= begin_time
+      AND SYSDATE() <= end_time
+      AND (store_id in (select aa.admin_store_id from (select e.admin_store_id from t_sys_areas e where e.area_id =
+      (select a.parent_id from t_sys_areas a where a.area_id =
+      (select s.area_id from t_cm_store s where s.store_id = #{storeId,jdbcType=VARCHAR}))
+      UNION
+      select a.admin_store_id from t_sys_areas a where a.area_id =
+      (select s.area_id from t_cm_store s where s.store_id = #{storeId,jdbcType=VARCHAR})
+      UNION
+      select #{storeId,jdbcType=VARCHAR} as admin_store_id) aa)
+      OR store_id = #{defaultStoreId,jdbcType=VARCHAR}
+      )
+      order by create_time desc
+     ]]>
+  </select>
+  <!-- 查询总店是否有活动 -->
+  <select id="t_app_activity_selectMainStoreActivity" resultType="map">
+    <![CDATA[
+       select *,
+      (select DISTINCT 1 from t_app_activity_property p where p.pro_type='4' and p.pro_data=#{storeId,jdbcType=VARCHAR} and p.act_id=#{activityId,jdbcType=VARCHAR}) as includeStore,
+      (select 1 from t_app_activity_property p where p.pro_type='5' and p.pro_data=#{storeId,jdbcType=VARCHAR} and p.act_id=#{activityId,jdbcType=VARCHAR}) as besideStore,
+      (select SUM(1) from t_app_activity_property p where p.pro_type='4' and p.act_id=#{activityId,jdbcType=VARCHAR}) as includeStoreSize
+      from t_app_activity_rule r where r.act_id=#{activityId,jdbcType=VARCHAR}
+    ]]>
+  </select>
+
+  <!-- 查询店铺是否在满类型活动范围内 -->
+  <select id="t_app_activity_selectStoreIfInclude" resultType="map">
+       select
+      (select 1 from t_app_activity_property p where p.pro_type='4' and p.pro_data=#{storeId,jdbcType=VARCHAR} and p.act_id=#{activityId,jdbcType=VARCHAR}) as includeStore,
+      (select 1 from t_app_activity_property p where p.pro_type='5' and p.pro_data=#{storeId,jdbcType=VARCHAR} and p.act_id=#{activityId,jdbcType=VARCHAR}) as besideStore,
+      (select COUNT(1) from t_app_activity_property p where p.pro_type='4' and p.act_id=#{activityId,jdbcType=VARCHAR}) as includeStoreSize
+  </select>
+
+  <!-- 查询全部全局活动Id -->
+  <select id="t_app_activity_selectWholeActivityId" resultType="map">
+    <![CDATA[
+      select
+       aa.activity_id,aa.activity_type
+      from
+      (select t.activity_id,t.activity_type from t_app_activity t where t.activity_type='5' and t.begin_time<SYSDATE() and t.end_time >SYSDATE() and t.STATUS='1'
+      union
+      select t.activity_id,t.activity_type from t_app_activity t where t.activity_type='6' and t.begin_time<SYSDATE() and t.end_time >SYSDATE() and t.STATUS='1' and t.store_id = #{cityStoreId,jdbcType=VARCHAR}
+      union
+      select t.activity_id,t.activity_type from t_app_activity t where t.activity_type='7' and t.begin_time<SYSDATE() and t.end_time >SYSDATE() and t.STATUS='1' and t.store_id = #{areaStoreId,jdbcType=VARCHAR}
+      union
+      select t.activity_id,t.activity_type from t_app_activity t where t.activity_type='8' and t.begin_time<SYSDATE() and t.end_time >SYSDATE() and t.STATUS='1' and t.store_id = #{storeId,jdbcType=VARCHAR}) aa
+      order BY aa.activity_type ASC
+    ]]>
+  </select>
+
+  <!-- 查询全部满类型活动Id -->
+  <select id="t_app_activity_selectWholeFullTypeActivityId" resultType="map">
+    <![CDATA[
+      select
+       aa.activity_id,aa.activity_type,aa.activity_scope
+      from
+      (select t.activity_id,t.activity_type,t.activity_scope from t_app_activity t where t.activity_type in('10','11','12') and t.activity_scope='5' and t.begin_time<SYSDATE() and t.end_time >SYSDATE() and t.STATUS='1'
+      union
+      select t.activity_id,t.activity_type,t.activity_scope from t_app_activity t where t.activity_type in('10','11','12') and t.activity_scope='6' and t.begin_time<SYSDATE() and t.end_time >SYSDATE() and t.STATUS='1' and t.store_id = #{cityStoreId,jdbcType=VARCHAR}
+      union
+      select t.activity_id,t.activity_type,t.activity_scope from t_app_activity t where t.activity_type in('10','11','12') and t.activity_scope='7' and t.begin_time<SYSDATE() and t.end_time >SYSDATE() and t.STATUS='1' and t.store_id = #{areaStoreId,jdbcType=VARCHAR}
+      union
+      select t.activity_id,t.activity_type,t.activity_scope from t_app_activity t where t.activity_type in('10','11','12') and t.activity_scope='8' and t.begin_time<SYSDATE() and t.end_time >SYSDATE() and t.STATUS='1' and t.store_id = #{storeId,jdbcType=VARCHAR}) aa
+      order BY aa.activity_scope ASC
+    ]]>
+  </select>
+
+  <!-- 查询总店唯一活动 -->
+  <select id="t_app_activity_selectMainStoreActivityOne" resultType="map" parameterType="map">
+     select t.activity_id from t_app_activity t where t.activity_type=#{activityType,jdbcType=VARCHAR} and t.begin_time &lt; sysdate()
+     and t.end_time &gt; sysdate() and t.STATUS=1
+     <if test="activityType != 5">
+        and t.store_id = #{storeId,jdbcType=VARCHAR}
+     </if>
+  </select>
+
+  <!-- 查询某店铺唯一类型活动 -->
+  <select id="t_app_activity_selectActivityOnlyOne" resultType="map" parameterType="map">
+    select *
+    from t_app_activity a
+    where a.activity_type in ('10','11','12') and a.begin_time &lt; SYSDATE()
+    and a.end_time &gt; SYSDATE() and a.STATUS = '1'
+    and a.activity_scope = #{activityScope,jdbcType=VARCHAR}
+    <if test="storeId != null">
+      and a.store_id = #{storeId,jdbcType=VARCHAR}
+    </if>
+  </select>
+
+  <!-- 查询总店活动 -->
+  <select id="t_app_activity_selectMainStoreActivityOF5" resultMap="ActivityResultMap">
+
+    select *
+    from t_app_activity t where t.activity_type in
+    <foreach collection="theTypeList" open="(" close=")" separator="," item="item">
+      #{item,jdbcType=VARCHAR}
+    </foreach>
+    and t.begin_time &lt; sysdate()
+    and t.end_time &gt; sysdate() and (t.STATUS='1' OR t.STATUS='0')
+    <if test="searchStoreId != null">
+      and t.store_id = #{searchStoreId,jdbcType=VARCHAR}
+    </if>
+    <if test="searchStoreId == null">
+      <!-- 企业 1;市代3;区代4;加盟店0;配送员2 -->
+      <if test="userType == 3">
+        and t.store_id IN (select a.admin_store_id store_id from t_sys_areas a where a.admin_store_id = #{storeId,jdbcType=VARCHAR}
+        UNION
+        select s.store_id from t_cm_store s where s.area_id in
+        (select a.area_id from t_sys_areas a where a.parent_id =
+        (select a.area_id from t_sys_areas a where a.admin_store_id = #{storeId,jdbcType=VARCHAR})))
+      </if>
+      <if test="userType == 4">
+        and t.store_id IN (select s.store_id from t_cm_store s where s.area_id =
+        (select a.area_id from t_sys_areas a where a.admin_store_id = #{storeId,jdbcType=VARCHAR}))
+      </if>
+      <if test="userType == 0">
+        and t.store_id = #{storeId,jdbcType=VARCHAR}
+      </if>
+    </if>
+    order by t.create_time DESC
+
+  </select>
+  <!-- 设定总店右上角活动图标 -->
+  <update id="t_app_activity_updateItemRightTopLogo" parameterType="map">
+    update t_cm_store_item SET
+    isHadLogo= #{isHadLogo,jdbcType=VARCHAR},
+    logo_id= #{logoId,jdbcType=VARCHAR}
+    where store_id= #{storeId,jdbcType=VARCHAR} and item_id in
+    <foreach collection="itemList" open="(" close=")" separator="," item="item">
+      #{item,jdbcType=VARCHAR}
+    </foreach>
+  </update>
+  <!-- 查询有右上角角标的商品 -->
+  <select id="t_app_activity_selectStoreRightTopLogoItem" resultType="map">
+    select
+    m.item_id as itemId,m.store_id as storeId,m.category_id as categoryId,m.isHadLogo,m.logo_id as logoId,m.store_item_id as storeItemId,m.remarks,
+    c.item_name,o.logo_name,o.logo_url,s.store_name,c.image_url
+    from t_cm_store_item m,t_cm_item c,t_cm_store_item_logo o,t_cm_store s where m.item_id=c.item_id and m.store_id= #{storeId,jdbcType=VARCHAR}
+    and m.logo_id=o.logo_id and s.store_id=m.store_id
+    <if test="logoId != null" >
+      and m.logo_id=#{logoId,jdbcType=VARCHAR}
+    </if>
+    <if test="logoId == null" >
+      and m.logo_id in (select o.logo_id from t_cm_store_item_logo o where o.STATUS='1')
+    </if>
+    <if test="bigCategoryId != null" >
+      and m.category_id in (select c.category_id from t_cm_category c where c.STATUS='1' and c.parent_id=#{bigCategoryId,jdbcType=VARCHAR})
+    </if>
+    <if test="smallCategoryId != null" >
+      and m.category_id = #{smallCategoryId,jdbcType=VARCHAR}
+    </if>
+    <if test="itemName != null" >
+      and c.item_name like "%"#{itemName,jdbcType=VARCHAR}"%"
+    </if>
+  </select>
+  <!--根据门店ID 查询有效的红包活动-->
+  <select id="t_app_activity_selectByStoreId" parameterType="java.lang.String" resultMap="ActivityResultMap">
+    <![CDATA[
+
+     select *
+     from t_app_activity  as taa
+     left join t_app_activity_rule  taar
+     on  taa.`activity_id`=taar.`act_id`
+     where taa.activity_type=9
+     and taa.store_id=#{storeId} and
+    taa.end_time >NOW()
+    and status=1
+
+    ]]>
+  </select>
+
+  <!--查询店铺是否有红包活动-->
+  <select id="t_app_activity_selectIsExistsByStoreId" parameterType="java.lang.String" resultType="int">
+    SELECT COUNT(1) FROM t_app_activity_property taap
+    LEFT JOIN t_app_activity taa on taap.act_id=taa.activity_id
+    LEFT JOIN t_app_activity_coupon taac on taac.activity_id=taa.activity_id
+    WHERE #{payTime,jdbcType=TIMESTAMP}>=taa.begin_time and taa.end_time>#{payTime,jdbcType=TIMESTAMP}
+    <!--代金券总数量需要大于已消耗的数量-->
+    and taac.sys_status=1 and taac.cou_count>taac.consum_count
+    and taa.STATUS=1 and taa.activity_type=9
+    <!--包含店铺-->
+    AND ((pro_type=4 AND pro_data=#{storeId})
+    <!--不在排除店铺-->
+    OR (pro_type=5 AND pro_data!=#{storeId}
+    AND taa.store_id in(
+    <foreach collection="list" item="item" separator=",">
+      #{item}
+    </foreach>
+    )
+    )
+    )
+  </select>
+
+  <!--查询活动-->
+  <select id="t_app_activity_selectFullTypeActivity" parameterType="map" resultMap="ActivityResultMap">
+    select a.* from t_app_activity a
+    LEFT JOIN t_app_activity_rule r ON r.act_id = a.activity_id
+    where a.store_id = #{storeId,jdbcType=VARCHAR} and a.activity_type = #{activityType,jdbcType=VARCHAR}
+    and r.rule_type = #{ruleType,jdbcType=VARCHAR}
+    <if test="status != null">
+      and a.STATUS = #{status,jdbcType=VARCHAR}
+    </if>
+    <if test="beginTime != null">
+      <if test="endTime != null">
+        and a.begin_time &lt; #{beginTime,jdbcType=VARCHAR} and a.end_time &gt; #{endTime,jdbcType=VARCHAR}
+      </if>
+    </if>
+    GROUP BY a.activity_id
+  </select>
+
+  <!--多条件查询满类型活动-->
+  <select id="t_app_activity_selectRuleAndPorperty" parameterType="com.dingdang.common.domain.Activity" resultMap="ActivityResultMap">
+    select
+    activity_id, store_id, activity_number, activity_name, activity_content, activity_type,activity_scope,layout_type,goto_type,
+    award_count, begin_time, end_time, image_url, target_url, status, remarks, creater,
+    create_time, modifier, modify_time,back_image_url,over_back_image_url,
+    (select s.store_name from t_cm_store s where s.store_id = taamr.store_id) storeName
+    from t_app_activity taamr
+    where 1=1
+    <if test="activityNumber != null">
+      and taamr.activity_number = #{activityNumber,jdbcType=VARCHAR}
+    </if>
+    <if test="storeId != null">
+      and taamr.store_id = #{storeId,jdbcType=VARCHAR}
+    </if>
+    <if test="status != null">
+      and taamr.STATUS = #{status,jdbcType=VARCHAR}
+    </if>
+    <if test="activityName != null">
+      and taamr.activity_name like CONCAT('%',#{activityName,jdbcType=VARCHAR},'%')
+    </if>
+    <if test="activityScope != null">
+      and taamr.activity_scope = #{activityScope,jdbcType=VARCHAR}
+    </if>
+    <if test="activityType != null">
+      and taamr.activity_type = #{activityType,jdbcType=VARCHAR}
+    </if>
+    <if test="activityType == null">
+      and taamr.activity_type in ('10','11','12')
+    </if>
+    <if test="beginTime != null">
+      <if test="endTime != null">
+        and taamr.begin_time &gt; #{beginTime,jdbcType=TIMESTAMP}
+        and taamr.end_time &lt; #{endTime,jdbcType=TIMESTAMP}
+      </if>
+    </if>
+  </select>
+
+  <!--app多条件查询满类型活动-->
+  <select id="t_app_activity_selectFullTypeActivityApp" resultMap="ActivityMap" parameterType="map">
+    select
+    activity_id, store_id, activity_number, activity_name, activity_content, activity_type,activity_scope,layout_type,goto_type,
+    award_count, begin_time, end_time, image_url, target_url, status, remarks,back_image_url,over_back_image_url,
+    (select u.user_name from t_user u where u.user_id = taamr.creater) creater,
+    (select u.user_name from t_user u where u.user_id = taamr.MODIFIER) modifier,
+    create_time, modify_time,
+    (select s.store_name from t_cm_store s where s.store_id = taamr.store_id) storeName
+    from t_app_activity taamr
+    where 1=1
+    and taamr.STATUS = '1'
+    and taamr.activity_type in ('10','11','12')
+    and taamr.begin_time &lt;= SYSDATE()
+    and taamr.end_time &gt;= SYSDATE()
+    and (taamr.store_id in
+    <foreach collection="list" item="item" separator="," open="(" close=")">
+      #{item,jdbcType=VARCHAR}
+    </foreach> or activity_scope = '5')
+    ORDER BY taamr.activity_scope ASC
+  </select>
+
+  <select id="t_app_activity_selectInfoByActId" parameterType="map" resultType="map">
+    select a.activity_id activityId,a.activity_name activityName,a.activity_type activityType from t_app_activity a where a.activity_id = #{activityId,jdbcType=VARCHAR}
+  </select>
+
+</mapper>
